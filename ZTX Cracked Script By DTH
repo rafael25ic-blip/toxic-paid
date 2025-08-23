@@ -1,6 +1,6 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/1882827/865357UI/refs/heads/main/U585467I", true))()
 
-local window = library:AddWindow("Craked scrip By Jesus", {
+local window = library:AddWindow("ZTX CRACKED SCRIPT", {
     main_color = Color3.fromRGB(139, 0 ,0 ),
     min_size = Vector2.new(700, 700),
     can_resize = true,
@@ -1991,8 +1991,8 @@ end)
 
 local credits = window:AddTab("Credits")
 
-credits:AddLabel("Scrip Craked by Jesus")
+credits:AddLabel("Script Cracked by Rafael")
 
 credits:AddLabel("Free Version")
 
-credits:AddLabel("Discord: jesusms13")
+credits:AddLabel("Discord: rafael25ic")
