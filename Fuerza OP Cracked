@@ -1,0 +1,40 @@
+local a = game:GetService("ReplicatedStorage")
+local b = game:GetService("Players")
+local c = b.LocalPlayer
+
+local function equipSamurai()
+    for _, n in pairs(c.petsFolder.Unique:GetChildren()) do
+        if n.Name == "Swift Samurai" then
+            a.rEvents.equipPetEvent:FireServer("equipPet", n)
+        end
+    end
+end
+
+-- Configuração do "tiro"
+local totalReps = 1200 -- reps necessárias para 200B (ajustado)
+local threads = 10 -- Dividimos em 10 blocos
+local repsPerThread = math.floor(totalReps / threads)
+
+equipSamurai()
+
+-- Loop de tiros a cada 10 segundos
+while true do
+    local startTime = tick() -- Marca o tempo de início do ciclo
+    for i = 1, threads do
+        task.spawn(function()
+            for _ = 1, repsPerThread do
+                -- Envia repetições duas vezes por iteração
+                c.muscleEvent:FireServer("rep")
+                c.muscleEvent:FireServer("rep") 
+                c.muscleEvent:FireServer("rep")
+            end
+        end)
+    end
+
+    -- Calcula o tempo decorrido e ajusta a espera
+    local elapsedTime = tick() - startTime
+    local waitTime = math.max(6.5 - elapsedTime, 0) -- Garante que o tempo de espera não seja negativo
+
+    print("Tiro de 200B disparado!")
+    task.wait(waitTime) -- Espera o tempo ajustado antes do próximo tiro
+end
