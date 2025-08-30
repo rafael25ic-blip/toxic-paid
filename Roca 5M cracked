@@ -1,0 +1,88 @@
+-- ⛏️ AutoRockHit Mejorado (con debug y toggle ON/OFF)
+
+-- Alternamos el estado
+getgenv().AutoRockHit = not getgenv().AutoRockHit
+
+-- Variables para controlar y limpiar
+local loopThread
+local connCharacter
+
+if getgenv().AutoRockHit then
+    print("⛏️ AutoRockHit ACTIVADO")
+
+    local player = game.Players.LocalPlayer
+
+    -- Función para obtener Character y mano, con espera segura
+    local function getHand()
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hand = char:FindFirstChild("RightHand") or char:FindFirstChild("Right Arm")
+        if not hand then
+            warn("❌ No se encontró RightHand o Right Arm")
+        end
+        return hand
+    end
+
+    -- Obtenemos la mano inicialmente
+    local hand = getHand()
+
+    -- Reconectamos la mano en respawn
+    connCharacter = player.CharacterAdded:Connect(function(char)
+        hand = getHand()
+    end)
+
+    -- Función para localizar la roca, con espera y debug
+    local function getRockPart()
+        -- Intentamos esperar hasta 5 segundos a que aparezca la roca
+        local timeout = 5
+        local start = tick()
+        while tick() - start < timeout do
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj:IsA("Model") and obj.Name == "Muscle King Mountain" then
+                    local part = obj:FindFirstChildWhichIsA("BasePart")
+                    if part then
+                        return part
+                    end
+                end
+            end
+            task.wait(0.5)
+        end
+        warn("❌ No se encontró Ancient Jungle Rock en "..timeout.."s")
+    end
+
+    -- Función que simula el toque
+    local function simulateTouch()
+        if not hand or not hand.Parent then
+            warn("❌ Mano inválida, esperando reconexión...")
+            hand = getHand()
+            return
+        end
+
+        local rock = getRockPart()
+        if not rock then return end
+
+        -- Ráfaga de 3 toques rápidos
+        for _ = 1, 3 do
+            firetouchinterest(hand, rock, 0)
+            task.wait(0.01)
+            firetouchinterest(hand, rock, 1)
+        end
+    end
+
+    -- Hilo principal
+    loopThread = task.spawn(function()
+        while getgenv().AutoRockHit do
+            local ok, err = pcall(simulateTouch)
+            if not ok then
+                warn("⚠️ Error en simulateTouch:", err)
+            end
+            task.wait(0.08)
+        end
+        print("🛑 AutoRockHit DESACTIVADO")
+    end)
+
+else
+    print("🛑 AutoRockHit DESACTIVADO")
+    -- Limpiamos la conexión y el hilo si existían
+    if connCharacter then connCharacter:Disconnect() end
+    getgenv().AutoRockHit = false
+end
