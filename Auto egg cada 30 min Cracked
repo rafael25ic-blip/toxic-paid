@@ -1,0 +1,47 @@
+local player = game.Players.LocalPlayer
+local toolName = "Protein Egg" -- Asegúrate de que el nombre sea EXACTO
+local char = player.Character or player.CharacterAdded:Wait()
+
+if not _G.AutoProteinEggEnabled then
+    _G.AutoProteinEggEnabled = true
+    print("Auto Protein Egg ACTIVADO")
+
+    local function equipTool()
+        local bp = player.Backpack:FindFirstChild(toolName)
+        if bp then
+            char.Humanoid:EquipTool(bp)
+        end
+    end
+
+    -- Actualizar personaje si muere
+    player.CharacterAdded:Connect(function(c)
+        char = c
+        task.wait(1)
+    end)
+
+    -- Bucle con espera de 29 minutos (1740 segundos)
+    task.spawn(function()
+        while _G.AutoProteinEggEnabled do
+            local tool = char:FindFirstChild(toolName) or player.Backpack:FindFirstChild(toolName)
+            if tool then
+                equipTool()
+                pcall(function()
+                    tool:Activate()
+                end)
+                print("Protein Egg consumido, esperando 29 minutos...")
+            else
+                warn("No se encontró Protein Egg en Backpack o equipado")
+            end
+            -- Espera 29 minutos
+            for i = 1, 1750 do
+                if not _G.AutoProteinEggEnabled then break end
+                task.wait(1)
+            end
+        end
+        print("Auto Protein Egg DESACTIVADO")
+    end)
+
+else
+    _G.AutoProteinEggEnabled = false
+    print("Auto Protein Egg DESACTIVADO")
+end
