@@ -1,0 +1,49 @@
+-- ⚡ Golpea más rápido a "Ancient Jungle Rock" con toggle ON/OFF
+
+getgenv().AutoRockHit = not getgenv().AutoRockHit
+
+if getgenv().AutoRockHit then
+    print("⛏️ AutoRockHit ACTIVADO (rápido)")
+
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hand = character:FindFirstChild("RightHand") or character:FindFirstChild("Right Arm")
+
+    player.CharacterAdded:Connect(function(char)
+        character = char
+        hand = character:WaitForChild("RightHand", 3) or character:WaitForChild("Right Arm", 3)
+    end)
+
+    local function getRockPart()
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("Model") and obj.Name == "Ancient Jungle Rock" then
+                local part = obj:FindFirstChildWhichIsA("BasePart")
+                if part then return part end
+            end
+        end
+    end
+
+    local function simulateTouch()
+        if not hand or not hand:IsDescendantOf(workspace) then return end
+        local rock = getRockPart()
+        if rock then
+            -- Ráfaga de toques rápidos
+            for _ = 1, 3 do
+                firetouchinterest(hand, rock, 0)
+                task.wait(0.01)
+                firetouchinterest(hand, rock, 1)
+            end
+        end
+    end
+
+    task.spawn(function()
+        while getgenv().AutoRockHit do
+            pcall(simulateTouch)
+            task.wait(0.08) -- Golpes más frecuentes
+        end
+        print("🛑 AutoRockHit DESACTIVADO")
+    end)
+
+else
+    print("🛑 AutoRockHit DESACTIVADO")
+end
